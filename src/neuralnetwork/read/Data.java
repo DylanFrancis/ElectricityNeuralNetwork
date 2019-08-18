@@ -80,6 +80,7 @@ public class Data {
     private void addData(String s, InputPattern inputPattern, String type){
         try{
             double input = Double.parseDouble(s);
+            if(input >= 2000 && input <= 2010) input = input - 1999;
             if (type.equals("input")) inputPattern.addInput(input);
             else inputPattern.addOutput(input);
         }catch (NumberFormatException ignored){

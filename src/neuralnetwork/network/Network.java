@@ -12,14 +12,8 @@ import java.util.Iterator;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Network {
-    private ArrayList<INeuron> hiddenLayer;
-    private ArrayList<INeuron> outputLayer;
     private DataSet dataSet;
-    private int[] z;
-    private int[] cat;
     private int[][] inputCount;
-
-
 
     public static void main(String[] args) {
         new Network().setup();
@@ -29,26 +23,22 @@ public class Network {
         try {
             Data data = new Data();
             dataSet = data.getDataSet("hourlydata.csv", 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27);
-
-
-
             run();
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
     private final int oNeurons = 24;
-    private final int yNeurons = 24;
-//    private ArrayList<IWeight> weightsOutput;
+    private final int yNeurons = 4;
+    private final int zInputs = 30;
     private ArrayList<IWeight> weightsHidden;
-    private IWeight[][] weightsOutput;
+    private IWeight[][] weightsOutput;  // outputNeuron -- outputWeight
     private OutputNeuron outputNeuron;
 
     private ANeuron yearNeuron;
     private MonthNeuron monthNeuron;
     private DayNeuron dayNeuron;
-
+    private MDayNeuron mDayNeuron;
     /**
      * Controls all testing
      * Calls doTest to fire for an input pattern
@@ -61,14 +51,10 @@ public class Network {
         initialiseWeights(1, 3);
 
 
-        yearNeuron = new ANeuron() {
-            @Override
-            public double fire(double... inputs) {
-                return 0;
-            }
-        };
+        yearNeuron = new YearNeuron();
         monthNeuron = new MonthNeuron();
         dayNeuron = new DayNeuron();
+        mDayNeuron = new MDayNeuron();
 
         while (true){
             Iterator<InputPattern> trainingIterator = dataSet.trainingIterator();
@@ -86,35 +72,69 @@ public class Network {
      */
     private InputPattern doTest(InputPattern cur, OutputNeuron outputNeuron, InputPattern... others){
 
+        double[] hiddenResults = hiddenLayer(cur);
+        double[] outputResults = outputLayer(hiddenResults);
 
-
+        adjustWeights(outputResults, cur);
 
         return cur;
     }
 
-    private void hiddenLayer(){
-        double y1 = yearNeuron.fire();
-        double y2 = monthNeuron.fire();
-        double y3 = dayNeuron.fire();
+    private void adjustWeights(double[] outputResults, InputPattern cur){
+
     }
 
-    private void outputLayer(double... inputs){
+    private double[] hiddenLayer(InputPattern cur){
+        double[] hiddenResults = new double[yNeurons];
+        assert yNeurons == cur.getSize();
+        for (int x = 0; x < cur.getSize(); x++){
+            double z = cur.getInput(x);
+            Double v = null;
+            IWeight weight = weightsHidden.get(x);
+            if (weight instanceof NormalWeight){
+                v = weight.getWeight();
+                hiddenResults[x] = fireHiddenNeuron(x, v * z);
+            }
+            if (weight instanceof CatWeight){
+                v = weight.getWeight((int) z);
+                hiddenResults[x] = fireHiddenNeuron(x, v);
+            }
+            assert v != null;
+
+        }
+        return hiddenResults;
+    }
+
+    private double fireHiddenNeuron(int neuron, double... inputs) {
+        switch (neuron){
+            case 0:
+                return yearNeuron.fire(inputs);
+            case 1:
+                return monthNeuron.fire(inputs);
+            case 2:
+                return dayNeuron.fire(inputs);
+            case 3:
+                return mDayNeuron.fire(inputs);
+        }
+        System.out.println("missing neuron");
+        return 0;
+    }
+
+    private double[] outputLayer(double... inputs){
+        double[] outputResults = new double[oNeurons];
         for (int x = 0; x < oNeurons; x++){
             double total = 0;
             for (int i = 0; i < inputs.length; i++) {
                 total += weightsOutput[x][i].getWeight() + inputs[i];
             }
-            double result = outputNeuron.fire(total);
+            outputResults[x] = outputNeuron.fire(total);
         }
-    }
-
-    private void adjustWeights(){
-
+        return outputResults;
     }
 
     private void initialiseWeights(int... cat){
         weightsHidden = new ArrayList<>();
-
+//        weightsHidden = new IWeight[yNeurons][zInputs];
 
         inputCount = dataSet.getInputCount(cat);
 

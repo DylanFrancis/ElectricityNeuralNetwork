@@ -21,4 +21,18 @@ public class NormalWeight implements IWeight {
     public void sumWeight(double sum, int... idx) {
         weight += sum;
     }
+
+    public void subWeight(double sub, int... idx) {
+        weight += sub;
+    }
+
+    @Override
+    public void display() {
+        System.out.println("    " + weight);
+    }
+
+    @Override
+    public String toString() {
+        return weight + "\n";
+    }
 }

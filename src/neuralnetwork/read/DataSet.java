@@ -39,7 +39,7 @@ public class DataSet {
         }
         set.forEach(inputPattern -> {
             for (int i = 0; i < inputs.length; i++) {
-                map.get(inputs[i]).add(inputPattern.getInput(i));
+                map.get(inputs[i]).add(inputPattern.getInput(inputs[i]));
             }
         });
         int[][] count = new int[inputs.length][2];

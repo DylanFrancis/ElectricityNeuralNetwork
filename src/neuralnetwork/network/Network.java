@@ -202,39 +202,14 @@ public class Network {
         double[] hiddenResults = hiddenLayer(cur);
         double[] outputResults = outputLayer(hiddenResults);
 
-        adjustWeights(outputResults, hiddenResults, cur);
+        adjustOutputWeights(outputResults, hiddenResults, cur);
+        adjustHiddenWeights(outputResults, hiddenResults, cur);
 
         return cur;
     }
 
-    private void adjustWeights(double[] outputResults, double[] hiddenResults, InputPattern cur){
-        // Adjusting output weights
-        assert oNeurons == outputResults.length;
-
-        for (int i = 0; i < oNeurons; i++) {
-            for (int x = 0; x < yNeurons; x++){
-                double curWeight = weightsOutput[i][x].getWeight();
-                double t = cur.getOutput(i);
-                double o = outputResults[i];
-                double y = hiddenResults[x];
-
-                double changeInWeight = adjustOutputWeight(t, o, y);
-
-                assert !Double.isNaN(changeInWeight);
-                assert !Double.isInfinite(changeInWeight);
-
-                double newWeight = curWeight - LEARNING_RATE * changeInWeight;
-
-                assert !Double.isNaN(newWeight);
-                assert !Double.isInfinite(newWeight);
-
-                weightsOutput[i][x].setWeight(-1, newWeight);
-            }
-        }
-
-        // Adjusting hidden weights
+    private void adjustHiddenWeights(double[] outputResults, double[] hiddenResults, InputPattern cur){
         assert yNeurons == hiddenResults.length;
-
 
         for (int k = 0; k < oNeurons; k++){
             double t = cur.getOutput(k);
@@ -255,15 +230,44 @@ public class Network {
 
                 change = weight.getWeight((int) z - 1) - change;
 
-                assert !Double.isNaN(change) || !Double.isInfinite(change);
+                assert !Double.isNaN(change);
+                assert !Double.isInfinite(change);
+
                 weight.setWeight((int) z - 1, change);
-
             }
-
         }
     }
 
-    private double adjustOutputWeight(double t, double o, double y){
+
+
+    private void adjustOutputWeights(double[] outputResults, double[] hiddenResults, InputPattern cur){
+        assert oNeurons == outputResults.length;
+
+        for (int i = 0; i < oNeurons; i++) {
+            for (int x = 0; x < yNeurons; x++){
+                double curWeight = weightsOutput[i][x].getWeight();
+                double t = cur.getOutput(i);
+                double o = outputResults[i];
+                double y = hiddenResults[x];
+
+                double changeInWeight = doAdjustOutputWeight(t, o, y);
+
+                assert !Double.isNaN(changeInWeight);
+                assert !Double.isInfinite(changeInWeight);
+
+                double newWeight = curWeight - LEARNING_RATE * changeInWeight;
+
+                assert !Double.isNaN(newWeight);
+                assert !Double.isInfinite(newWeight);
+
+                weightsOutput[i][x].setWeight(-1, newWeight);
+            }
+        }
+
+
+    }
+
+    private double doAdjustOutputWeight(double t, double o, double y){
         return -1.0 * (t - o) * o * (1.0 - o) * y;
     }
 
@@ -330,7 +334,6 @@ public class Network {
 
     private void initialiseWeights(int... cat){
         weightsHidden = new ArrayList<>();
-//        weightsHidden = new IWeight[yNeurons][zInputs];
 
         inputCount = dataSet.getInputCount(cat);
 
@@ -343,9 +346,7 @@ public class Network {
             weightsHidden.add(new NormalWeight(getRandom()));
         }
 
-//        weightsOutput = new ArrayList<>();
         weightsOutput = new IWeight[oNeurons][yNeurons];
-
 
         for (int x = 0; x < oNeurons; x++){
             for (int y = 0; y < yNeurons; y++){

@@ -33,33 +33,28 @@ public class Network {
         try {
 
             for (int t = 0; t < 3; t++) {
-                double learningRate = 0.1 / 100000000000000.0;
+                double learningRate;
+
                 for (int y = 1; y <= 1000000000; y *= 10) {
                     learningRate = 0.1 / 100000000000000.0;
-                    double best = 9999999999.0;
                     learningRate *= y;
+
                     printRate(learningRate);
-//                    System.out.println("===========");
+
                     System.out.println(learningRate);
+
                     for (int x = 1; x <= 200; x += 1) {
                         Data data = new Data();
                         dataSet = data.getDataSet("hourlydata.csv", 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27);
                         double a = Math.abs(run(x, learningRate));
-//                        System.out.println(a);
-//                        System.out.println(x);
+
                         printResults(a, x);
-//                        if (a < best) {
-////                        System.out.println();
-////                        System.out.println("NEW BEST!");
-//                            System.out.println(a);
-//                            System.out.println(x);
-////                        System.out.println();
-//                            best = a;
-//                        }
                     }
+
                     weightWriter.flush();
                     resultWriter.flush();
                 }
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -123,8 +118,6 @@ public class Network {
      * Calls doTest to fire for an input pattern
      */
     private double run(int iterations, double learningRate){
-//        System.out.println();
-//        System.out.println(iterations);
         outputNeuron = new OutputNeuron();
 
         this.LEARNING_RATE = learningRate;
@@ -146,6 +139,7 @@ public class Network {
                 doTest(cur, outputNeuron);
             }
 
+            //TODO: validation iterations
 //            average = 0;
 ////            display();
 //            Iterator<InputPattern> validationIterator = dataSet.validationIterator();
@@ -177,6 +171,12 @@ public class Network {
         }
     }
 
+    /**
+     * TODO: calculate and return SSE
+     * Validation of an weights for an input pattern
+     * @param cur input pattern being validated
+     * @return average difference of outputs for cur for each output neuron
+     */
     private double validate(InputPattern cur){
         double[] hiddenResults = hiddenLayer(cur);
         double[] outputResults = outputLayer(hiddenResults);
@@ -194,8 +194,8 @@ public class Network {
 
     /**
      * Fires for one input pattern
-     * @param cur
-     * @param others
+     * @param cur input pattern
+     * @param others other input patterns to be added as inputs
      */
     private InputPattern doTest(InputPattern cur, OutputNeuron outputNeuron, InputPattern... others){
 
@@ -220,11 +220,13 @@ public class Network {
 
                 double changeInWeight = adjustOutputWeight(t, o, y);
 
-                assert !Double.isNaN(changeInWeight) || !Double.isInfinite(changeInWeight);
+                assert !Double.isNaN(changeInWeight);
+                assert !Double.isInfinite(changeInWeight);
 
                 double newWeight = curWeight - LEARNING_RATE * changeInWeight;
 
-                assert !Double.isNaN(newWeight) || !Double.isInfinite(newWeight);
+                assert !Double.isNaN(newWeight);
+                assert !Double.isInfinite(newWeight);
 
                 weightsOutput[i][x].setWeight(-1, newWeight);
             }

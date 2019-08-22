@@ -5,6 +5,7 @@ import neuralnetwork.read.*;
 import neuralnetwork.weights.CatWeight;
 import neuralnetwork.weights.IWeight;
 import neuralnetwork.weights.NormalWeight;
+import neuralnetwork.write.Writer;
 
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -18,81 +19,53 @@ import java.util.function.Consumer;
 public class Network {
     private DataSet dataSet;
     private int[][] inputCount;
+    private Writer writer;
 
     public static void main(String[] args) {
         new Network().setup();
     }
 
-    protected void setup(){
+    public Network() {
         try {
-            resultWriter = new FileWriter("./data/results.txt", true);
-            weightWriter = new FileWriter("./data/weights.txt", true);
-        } catch (IOException e) {
+            writer = new Writer(oNeurons, yNeurons);
+            Data data = new Data();
+            dataSet = data.getDataSet("hourlydata.csv", 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27);
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        try {
+//        outputNeuron = new OutputNeuron();
+        outputNeurons = new ArrayList<>();
+        for (int i = 0; i < oNeurons; i++) {
+            outputNeurons.add(new OutputNeuron());
+        }
+        yearNeuron  = new SigmoidNeuron();
+        monthNeuron = new SigmoidNeuron();
+        dayNeuron   = new SigmoidNeuron();
+        mDayNeuron  = new SigmoidNeuron();
+    }
 
-            for (int t = 0; t < 3; t++) {
+    protected void setup(){
+        try {
+            for (int t = 0; t < 1; t++) {
                 double learningRate;
 
                 for (int y = 1; y <= 1000000000; y *= 10) {
-                    learningRate = 0.1 / 100000000000000.0;
+                    learningRate = 0.1 / 1000000.0;
                     learningRate *= y;
 
-                    printRate(learningRate);
+                    writer.printRate(learningRate);
 
                     System.out.println(learningRate);
 
-                    for (int x = 1; x <= 200; x += 1) {
+                    for (int x = 1; x <= 1000; x += 1) {
                         Data data = new Data();
                         dataSet = data.getDataSet("hourlydata.csv", 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27);
-                        double a = Math.abs(run(x, learningRate));
-
-                        printResults(a, x);
+                        double avg = Math.abs(run(x, learningRate));
+                        writer.printResults(avg, x, weightsHidden, weightsOutput);
                     }
-
-                    weightWriter.flush();
-                    resultWriter.flush();
+                    writer.flush();
                 }
 
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    private FileWriter resultWriter;
-    private FileWriter weightWriter;
-
-    private void printRate(double rate){
-        try {
-            resultWriter.write("========================================================================================= \n");
-            resultWriter.write(rate + "\n");
-            weightWriter.write("========================================================================================= \n");
-            weightWriter.write(rate + "\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void printResults(double avg, double iterations){
-        try {
-            resultWriter.write(avg + "\n");
-//            resultWriter.write(iterations + "\n");
-
-            weightWriter.write(iterations + "\n");
-            weightWriter.write("hidden weights \n");
-            weightsHidden.forEach(iWeight -> {
-                try {
-                    weightWriter.write(iWeight.toString());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-            weightWriter.write("output weights \n");
-            for (int i = 0; i < oNeurons; i++) {
-                for (int y = 0; y < yNeurons; y++){
-                    weightWriter.write(weightsOutput[i][y].toString());
-                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -106,29 +79,26 @@ public class Network {
     private int iterations = 20;
 
     private ArrayList<IWeight> weightsHidden;
+    private ArrayList<OutputNeuron> outputNeurons;
     private IWeight[][] weightsOutput;  // outputNeuron -- outputWeight
-    private OutputNeuron outputNeuron;
+//    private OutputNeuron outputNeuron;
 
     private ANeuron yearNeuron;
-    private MonthNeuron monthNeuron;
-    private DayNeuron dayNeuron;
-    private MDayNeuron mDayNeuron;
+    private ANeuron monthNeuron;
+    private ANeuron dayNeuron;
+    private ANeuron mDayNeuron;
     /**
      * Controls all testing
      * Calls doTest to fire for an input pattern
      */
     private double run(int iterations, double learningRate){
-        outputNeuron = new OutputNeuron();
+
 
         this.LEARNING_RATE = learningRate;
 
         initialiseWeights(1, 3);
 
 
-        yearNeuron = new YearNeuron();
-        monthNeuron = new MonthNeuron();
-        dayNeuron = new DayNeuron();
-        mDayNeuron = new MDayNeuron();
 
         int i = 0;
 
@@ -136,7 +106,7 @@ public class Network {
             Iterator<InputPattern> trainingIterator = dataSet.trainingIterator();
             while (trainingIterator.hasNext()){
                 InputPattern cur = trainingIterator.next();
-                doTest(cur, outputNeuron);
+                doTest(cur);
             }
 
             //TODO: validation iterations
@@ -171,6 +141,12 @@ public class Network {
         }
     }
 
+    public void display(double... arr){
+        for (int i = 0; i < arr.length; i++) {
+            System.out.println(arr[i]);
+        }
+    }
+
     /**
      * TODO: calculate and return SSE
      * Validation of an weights for an input pattern
@@ -197,10 +173,13 @@ public class Network {
      * @param cur input pattern
      * @param others other input patterns to be added as inputs
      */
-    private InputPattern doTest(InputPattern cur, OutputNeuron outputNeuron, InputPattern... others){
+    private InputPattern doTest(InputPattern cur, InputPattern... others){
 
         double[] hiddenResults = hiddenLayer(cur);
         double[] outputResults = outputLayer(hiddenResults);
+
+//        display(hiddenResults);
+//        display(outputResults);
 
         adjustOutputWeights(outputResults, hiddenResults, cur);
         adjustHiddenWeights(outputResults, hiddenResults, cur);
@@ -214,7 +193,7 @@ public class Network {
         for (int k = 0; k < oNeurons; k++){
             double t = cur.getOutput(k);
             double o = outputResults[k];
-            double a = -1.0 * (t - o) * o * (1 - o);
+            double a = (t - o) * o * (1 - o);
 
             for (int j = 0; j < yNeurons; j++){
                 double w = weightsOutput[k][j].getWeight();
@@ -230,8 +209,8 @@ public class Network {
 
                 change = weight.getWeight((int) z - 1) - change;
 
-                assert !Double.isNaN(change);
-                assert !Double.isInfinite(change);
+//                assert !Double.isNaN(change);
+//                assert !Double.isInfinite(change);
 
                 weight.setWeight((int) z - 1, change);
             }
@@ -244,24 +223,27 @@ public class Network {
         assert oNeurons == outputResults.length;
 
         for (int i = 0; i < oNeurons; i++) {
+            double t = cur.getOutput(i);
+            double o = outputResults[i];
             for (int x = 0; x < yNeurons; x++){
                 double curWeight = weightsOutput[i][x].getWeight();
-                double t = cur.getOutput(i);
-                double o = outputResults[i];
                 double y = hiddenResults[x];
 
-                double changeInWeight = doAdjustOutputWeight(t, o, y);
+//                double changeInWeight = doAdjustOutputWeight(t, o, y);
+                double changeInWeight = LEARNING_RATE * ((t - o) * y);
 
-                assert !Double.isNaN(changeInWeight);
-                assert !Double.isInfinite(changeInWeight);
+//                assert !Double.isNaN(changeInWeight);
+//                assert !Double.isInfinite(changeInWeight);
 
-                double newWeight = curWeight - LEARNING_RATE * changeInWeight;
+//                double newWeight = curWeight - LEARNING_RATE * changeInWeight;
+                double newWeight = curWeight - changeInWeight;
 
-                assert !Double.isNaN(newWeight);
-                assert !Double.isInfinite(newWeight);
+//                assert !Double.isNaN(newWeight);
+//                assert !Double.isInfinite(newWeight);
 
                 weightsOutput[i][x].setWeight(-1, newWeight);
             }
+            outputNeurons.get(i).subBiasWeight(LEARNING_RATE * (t - o));
         }
 
 
@@ -271,11 +253,11 @@ public class Network {
         return -1.0 * (t - o) * o * (1.0 - o) * y;
     }
 
-    private double[] hiddenLayer(InputPattern cur){
+    public double[] hiddenLayer(InputPattern cur){
         // result (y) -- input (z)
         double[] hiddenResults = new double[yNeurons];
 
-        assert yNeurons == cur.getSize();
+//        assert yNeurons == cur.getSize();
 
         for (int x = 0; x < cur.getSize(); x++){
 
@@ -286,6 +268,9 @@ public class Network {
             if (weight instanceof NormalWeight){
                 v = weight.getWeight();
                 hiddenResults[x] = fireHiddenNeuron(x, v * z);
+
+//                assert hiddenResults[x] < 1;
+
                 continue;
             }
 
@@ -293,6 +278,9 @@ public class Network {
                 z--;
                 v = weight.getWeight((int) z);
                 hiddenResults[x] = fireHiddenNeuron(x, v);
+
+//                assert hiddenResults[x] < 1;
+
                 continue;
             }
 
@@ -315,7 +303,7 @@ public class Network {
         return 0;
     }
 
-    private double[] outputLayer(double... inputs){
+    public double[] outputLayer(double... inputs){
         double[] outputResults = new double[oNeurons];
 
         for (int x = 0; x < oNeurons; x++){
@@ -326,10 +314,30 @@ public class Network {
                 total += weightsOutput[x][i].getWeight() + inputs[i];
             }
 
-            outputResults[x] = outputNeuron.fire(total);
+            outputResults[x] = outputNeurons.get(x).fire(total);
         }
 
         return outputResults;
+    }
+
+    public void initialiseWeight(ArrayList<Double> hWeights, double[][] oWeights, int... cat){
+        weightsHidden = new ArrayList<>();
+        inputCount = dataSet.getInputCount(cat);
+
+        for (int x = 0; x < hWeights.size(); x++) {
+            if (setCategorical(hWeights.get(x), x, inputCount, cat))
+                continue;
+            // set as is
+            weightsHidden.add(new NormalWeight(getRandom()));
+        }
+
+        weightsOutput = new IWeight[oNeurons][yNeurons];
+
+        for (int x = 0; x < oNeurons; x++){
+            for (int y = 0; y < yNeurons; y++){
+                weightsOutput[x][y] = new NormalWeight(oWeights[x][y]);
+            }
+        }
     }
 
     private void initialiseWeights(int... cat){
@@ -355,6 +363,7 @@ public class Network {
         }
     }
 
+    @SuppressWarnings("Duplicates")
     private boolean setCategorical(int curPatternIdx, int[][] inputCount, int... catIdx){
         for (int i = 0; i < catIdx.length; i++) {
             // set categorical
@@ -378,7 +387,39 @@ public class Network {
         return false;
     }
 
+    @SuppressWarnings("Duplicates")
+    private boolean setCategorical(double w, int curPatternIdx, int[][] inputCount, int... catIdx){
+        for (int i = 0; i < catIdx.length; i++) {
+            // set categorical
+            if (curPatternIdx == catIdx[i]){
+                int categories = -1;
+                for (int y = 0; y < inputCount.length; y++){
+                    if (inputCount[y][0] != curPatternIdx) continue;
+                    categories = inputCount[y][1];
+                    break;
+                }
+                CatWeight weight = new CatWeight(categories);
+
+                for(int z = 0; z < categories; z++){
+                    weight.setWeight(z, w);
+                }
+
+                weightsHidden.add(weight);
+                return true;
+            }
+        }
+        return false;
+    }
+
     private double getRandom(){
         return ThreadLocalRandom.current().nextDouble();
+    }
+
+    public int getoNeurons() {
+        return oNeurons;
+    }
+
+    public int getyNeurons() {
+        return yNeurons;
     }
 }

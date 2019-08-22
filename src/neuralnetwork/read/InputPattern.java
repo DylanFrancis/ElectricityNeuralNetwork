@@ -16,6 +16,12 @@ public class InputPattern {
         inputs.add(input);
     }
 
+    public void addInput(String[] input){
+        for (String v : input) {
+            inputs.add(Double.parseDouble(v));
+        }
+    }
+
     public void addOutput(double output){
         outputs.add(output);
     }

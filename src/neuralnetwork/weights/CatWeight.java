@@ -1,14 +1,29 @@
 package neuralnetwork.weights;
 
-public class CatWeight implements IWeight {
+public class CatWeight extends AWeight{
     private double[] weights;
+    private double[] prevUpdate;
 
     public CatWeight(int size) {
         weights = new double[size];
+        prevUpdate = new double[size];
+        for (int x = 0; x < prevUpdate.length; x++){
+            prevUpdate[x] = 1;
+        }
     }
 
     public void setWeight(int idx, double newWeight){
         weights[idx] = newWeight;
+    }
+
+    @Override
+    public void setPrev(double prev, int... idx) {
+        prevUpdate[idx[0]] = prev;
+    }
+
+    @Override
+    public double getPrev(int... idx) {
+        return prevUpdate[idx[0]];
     }
 
     @Override
@@ -18,11 +33,15 @@ public class CatWeight implements IWeight {
 
     @Override
     public void sumWeight(double sum, int... idx) {
-        weights[idx[0]] += sum;
+        weights[idx[0]] += (sum + momentum * prevUpdate[idx[0]]);
+        setPrev(sum + momentum * prevUpdate[idx[0]], idx);
     }
 
+    @Override
     public void subWeight(double sub, int... idx) {
-        weights[idx[0]] -= sub;
+        setPrev(weights[idx[0]], idx);
+        weights[idx[0]] -= (sub + momentum * prevUpdate[idx[0]]);
+        setPrev(sub + momentum * prevUpdate[idx[0]], idx);
     }
 
     @Override

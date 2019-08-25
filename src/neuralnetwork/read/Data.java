@@ -36,17 +36,6 @@ public class Data {
         return dataSet;
     }
 
-    private void setOutput(LinkedList<InputPattern> list, int... outputs){
-        Iterator<InputPattern> iterator = list.iterator();
-
-        while (iterator.hasNext()) {
-            InputPattern cur = iterator.next();
-            for (int i = 0; i < outputs.length; i++) {
-
-            }
-        }
-    }
-
     private void setup(){
         training = new LinkedList<>();
         validation = new LinkedList<>();

@@ -30,4 +30,12 @@ public abstract class ANeuron implements INeuron{
         }
         return sum + (bias * biasWeight);
     }
+
+    public double getBiasWeight() {
+        return biasWeight;
+    }
+
+    public void setBiasWeight(double biasWeight) {
+        this.biasWeight = biasWeight;
+    }
 }

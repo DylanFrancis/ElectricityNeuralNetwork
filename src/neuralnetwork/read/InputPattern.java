@@ -6,6 +6,8 @@ public class InputPattern {
     private ArrayList<Double> inputs;
     private ArrayList<Double> outputs;
     private ArrayList<String> strings;
+    private double prevAvg;
+    private boolean hasPrev;
 
     public InputPattern() {
         inputs = new ArrayList<>();
@@ -17,9 +19,11 @@ public class InputPattern {
     }
 
     public void addInput(String[] input){
-        for (String v : input) {
-            inputs.add(Double.parseDouble(v));
+        int i;
+        for (i = 0; i < input.length; i++) {
+            inputs.add(Double.parseDouble(input[i]));
         }
+        hasPrev = true;
     }
 
     public void addOutput(double output){
@@ -54,5 +58,30 @@ public class InputPattern {
 
     public int getSize(){
         return inputs.size();
+    }
+
+    public double getPrev() {
+        return prevAvg;
+    }
+
+    public double calAverageOutput(){
+        final double[] total = {0};
+        outputs.forEach(aDouble -> total[0] += aDouble);
+        return total[0] / outputs.size();
+    }
+
+    public void setPrev(InputPattern prev) {
+        if(prev == null) return;
+        prevAvg = prev.calAverageOutput();
+        addInput(prevAvg);
+        hasPrev = true;
+    }
+
+    public boolean hasPrev() {
+        return hasPrev;
+    }
+
+    public Double[] getOutputs(){
+        return outputs.toArray(new Double[outputs.size()]);
     }
 }

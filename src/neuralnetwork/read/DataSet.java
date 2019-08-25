@@ -21,6 +21,8 @@ public class DataSet {
         this.maxInputs = maxInputs;
         totalSize = training.size() - 1;
         setParams();
+        link();
+//        prune();
     }
 
     private void setParams(){
@@ -50,6 +52,20 @@ public class DataSet {
             c.getAndIncrement();
         });
         return count;
+    }
+
+    private void prune(){
+        set.removeIf(cur -> !cur.hasPrev());
+    }
+
+    private void link(){
+        Iterator<InputPattern> iterator = set.descendingIterator();
+        InputPattern prev = null;
+        while (iterator.hasNext()){
+            InputPattern cur = iterator.next();
+            cur.setPrev(prev);
+            prev = cur;
+        }
     }
 
     public String getParam(int p){

@@ -1,10 +1,22 @@
 package neuralnetwork.weights;
 
-public class NormalWeight implements IWeight {
+public class NormalWeight extends AWeight{
     private double weight;
+    private double prevWeight;
 
     public NormalWeight(double weight) {
         this.weight = weight;
+        prevWeight = 1;
+    }
+
+    @Override
+    public void setPrev(double prev, int... idx) {
+        prevWeight = prev;
+    }
+
+    @Override
+    public double getPrev(int... idx) {
+        return prevWeight;
     }
 
     @Override
@@ -19,11 +31,13 @@ public class NormalWeight implements IWeight {
 
     @Override
     public void sumWeight(double sum, int... idx) {
-        weight += sum;
+        weight += (sum + momentum * prevWeight);
+        setPrev(sum + + momentum * prevWeight);
     }
 
     public void subWeight(double sub, int... idx) {
-        weight += sub;
+        weight += (sub + momentum * prevWeight);
+        setPrev(sub + + momentum * prevWeight);
     }
 
     @Override

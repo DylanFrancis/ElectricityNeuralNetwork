@@ -7,9 +7,7 @@ public class CatWeight extends AWeight{
     public CatWeight(int size) {
         weights = new double[size];
         prevUpdate = new double[size];
-        for (int x = 0; x < prevUpdate.length; x++){
-            prevUpdate[x] = 1;
-        }
+        for (int x = 0; x < prevUpdate.length; x++) prevUpdate[x] = 1;
     }
 
     public void setWeight(int idx, double newWeight){
@@ -33,35 +31,25 @@ public class CatWeight extends AWeight{
 
     @Override
     public void sumWeight(double sum, int... idx) {
-//        weights[idx[0]] += (sum + momentum * prevUpdate[idx[0]]);
-//        setPrev(sum + momentum * prevUpdate[idx[0]], idx);
-
-        weights[idx[0]] += sum;
+        weights[idx[0]] += (sum + momentum * prevUpdate[idx[0]]);
+        setPrev(sum + momentum * prevUpdate[idx[0]], idx);
     }
 
     @Override
     public void subWeight(double sub, int... idx) {
-//        setPrev(weights[idx[0]], idx);
-//        weights[idx[0]] -= (sub + momentum * prevUpdate[idx[0]]);
-//        setPrev(sub + momentum * prevUpdate[idx[0]], idx);
-
-
-        weights[idx[0]] += sub;
+        weights[idx[0]] -= (sub + momentum * prevUpdate[idx[0]]);
+        setPrev(sub + momentum * prevUpdate[idx[0]], idx);
     }
 
     @Override
     public void display() {
-        for (int i = 0; i < weights.length; i++) {
-            System.out.println("    " + weights[i]);
-        }
+        for (int i = 0; i < weights.length; i++) System.out.println("    " + weights[i]);
     }
 
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        for (double weight : weights) {
-            stringBuilder.append(weight).append("\n");
-        }
+        for (double weight : weights) stringBuilder.append(weight).append("\n");
         return stringBuilder.toString();
     }
 }

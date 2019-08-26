@@ -1,5 +1,4 @@
 package neuralnetwork.read;
-
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -68,24 +67,8 @@ public class DataSet {
         }
     }
 
-    public String getParam(int p){
-        return params[p];
-    }
-
-    public int getParamSize(){
-        return params.length;
-    }
-
-    public void shuffleTraining(){
-        Collections.shuffle(training);
-    }
-
     public LinkedList<InputPattern> getTraining() {
         return training;
-    }
-
-    public LinkedList<InputPattern> getValidation() {
-        return validation;
     }
 
     public LinkedList<InputPattern> getTest() {
@@ -94,10 +77,6 @@ public class DataSet {
 
     public Iterator<InputPattern> trainingIterator(){
         return training.iterator();
-    }
-
-    public Iterator<InputPattern> validationIterator(){
-        return validation.iterator();
     }
 
     public Iterator<InputPattern> testIterator(){
@@ -112,39 +91,19 @@ public class DataSet {
         this.test = test;
     }
 
-    public double getLastMax(){
-        return maxInputs[maxInputs.length - 1];
-    }
-
-    public double getMaxInput(int idx){
-        return maxInputs[idx];
-    }
-
-    public double[] getMaxInputs() {
-        return maxInputs;
-    }
-
     public int getTestSize() {
         return testSize;
-    }
-
-    public void setTestSize(int testSize) {
-        this.testSize = testSize;
     }
 
     public int getValidationSize() {
         return validationSize;
     }
 
-    public void setValidationSize(int validationSize) {
-        this.validationSize = validationSize;
-    }
-
     public int getTotalSize() {
         return totalSize;
     }
 
-    public String[] getParams() {
-        return params;
+    public Iterator<InputPattern> validationIterator() {
+        return validation.iterator();
     }
 }

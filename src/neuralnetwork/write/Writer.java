@@ -1,23 +1,17 @@
 package neuralnetwork.write;
-
 import neuralnetwork.neurons.OutputNeuron;
 import neuralnetwork.weights.IWeight;
-
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Writer {
     private FileWriter testWriter;
     private FileWriter testResultsWriter;
     private FileWriter trainingWriter;
-    private FileWriter resultWriter;
     private FileWriter weightWriter;
     private int oNeurons;
     private int yNeurons;
-//    private String dir = "../EvoPrac2Data/";
     private String dir = "./data/";
 
     public Writer(int oNeurons, int yNeurons, String name) {
@@ -27,7 +21,6 @@ public class Writer {
             testResultsWriter = new FileWriter(dir + "testResults/testResults" + name + ".csv", true);
             testWriter = new FileWriter(dir + "test/test" + name + ".csv", true);
             trainingWriter = new FileWriter(dir +  "training/training" + name + ".csv", true);
-//            resultWriter = new FileWriter("./data/results" + name + ".csv", true);
             weightWriter = new FileWriter(dir + "weights/weights" + name + ".txt", true);
 
             testResultsWriter.write("target;actual;difference");
@@ -43,8 +36,6 @@ public class Writer {
 
     public void printRate(double rate){
         try {
-//            resultWriter.write("========================================================================================= \n");
-//            resultWriter.write("\n" + rate + ";");
             weightWriter.write("========================================================================================= \n");
             weightWriter.write(rate + "\n");
         } catch (IOException e) {
@@ -84,7 +75,6 @@ public class Writer {
 
     public void printWeights(double iterations, double epochs, ArrayList<IWeight> weightsHidden, IWeight[][] weightsOutput, ArrayList<OutputNeuron> outputNeurons){
         try {
-//            resultWriter.write(iterations + "\n");
             weightWriter.write("epochs" + epochs + "\n");
             weightWriter.write(iterations + "\n");
             weightWriter.write("hidden\n");
@@ -116,7 +106,6 @@ public class Writer {
             testWriter.flush();
             testResultsWriter.flush();
             weightWriter.flush();
-//            resultWriter.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -128,7 +117,6 @@ public class Writer {
             testWriter.close();
             testResultsWriter.close();
             weightWriter.close();
-//            resultWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

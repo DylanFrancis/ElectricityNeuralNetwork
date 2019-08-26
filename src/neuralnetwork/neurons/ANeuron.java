@@ -15,10 +15,6 @@ public abstract class ANeuron implements INeuron{
         return sum(inputs);
     }
 
-    public void sumBiasWeight(double biasChange){
-        biasWeight += biasChange;
-    }
-
     public void subBiasWeight(double biasChange){
         biasWeight -= biasChange;
     }

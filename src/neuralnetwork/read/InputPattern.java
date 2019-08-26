@@ -1,5 +1,4 @@
 package neuralnetwork.read;
-
 import java.util.ArrayList;
 
 public class InputPattern {
@@ -19,10 +18,7 @@ public class InputPattern {
     }
 
     public void addInput(String[] input){
-        int i;
-        for (i = 0; i < input.length; i++) {
-            inputs.add(Double.parseDouble(input[i]));
-        }
+        for (int i = 0; i < input.length; i++) inputs.add(Double.parseDouble(input[i]));
         hasPrev = true;
     }
 
@@ -52,16 +48,8 @@ public class InputPattern {
         inputs.set(idx, value);
     }
 
-    public double getLastInput(){
-        return inputs.get(inputs.size() - 1);
-    }
-
     public int getSize(){
         return inputs.size();
-    }
-
-    public double getPrev() {
-        return prevAvg;
     }
 
     public double calAverageOutput(){

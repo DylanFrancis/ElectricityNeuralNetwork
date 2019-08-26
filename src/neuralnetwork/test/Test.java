@@ -1,9 +1,7 @@
 package neuralnetwork.test;
-
 import neuralnetwork.network.Network;
 import neuralnetwork.neurons.OutputNeuron;
 import neuralnetwork.read.InputPattern;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -27,7 +25,6 @@ public class Test {
             ArrayList<String> weights = null;
             try {
                 weights = new BufferedReader(new FileReader(Objects.requireNonNull(files.listFiles())[f])).lines().skip(5).collect(Collectors.toCollection(ArrayList::new));
-//                weights.remove(22);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -85,8 +82,6 @@ public class Test {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-//                network.display(outputResults);
-//                System.out.println();
             }
         }
     }

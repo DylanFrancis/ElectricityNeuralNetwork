@@ -33,15 +33,20 @@ public class CatWeight extends AWeight{
 
     @Override
     public void sumWeight(double sum, int... idx) {
-        weights[idx[0]] += (sum + momentum * prevUpdate[idx[0]]);
-        setPrev(sum + momentum * prevUpdate[idx[0]], idx);
+//        weights[idx[0]] += (sum + momentum * prevUpdate[idx[0]]);
+//        setPrev(sum + momentum * prevUpdate[idx[0]], idx);
+
+        weights[idx[0]] += sum;
     }
 
     @Override
     public void subWeight(double sub, int... idx) {
-        setPrev(weights[idx[0]], idx);
-        weights[idx[0]] -= (sub + momentum * prevUpdate[idx[0]]);
-        setPrev(sub + momentum * prevUpdate[idx[0]], idx);
+//        setPrev(weights[idx[0]], idx);
+//        weights[idx[0]] -= (sub + momentum * prevUpdate[idx[0]]);
+//        setPrev(sub + momentum * prevUpdate[idx[0]], idx);
+
+
+        weights[idx[0]] += sub;
     }
 
     @Override

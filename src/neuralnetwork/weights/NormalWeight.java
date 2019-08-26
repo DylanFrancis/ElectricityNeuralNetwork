@@ -31,13 +31,17 @@ public class NormalWeight extends AWeight{
 
     @Override
     public void sumWeight(double sum, int... idx) {
-        weight += (sum + momentum * prevWeight);
-        setPrev(sum + + momentum * prevWeight);
+//        weight += (sum + momentum * prevWeight);
+//        setPrev(sum + momentum * prevWeight);
+
+        weight += sum;
     }
 
     public void subWeight(double sub, int... idx) {
-        weight += (sub + momentum * prevWeight);
-        setPrev(sub + + momentum * prevWeight);
+//        weight += (sub + momentum * prevWeight);
+//        setPrev(sub + momentum * prevWeight);
+
+        weight -= sub;
     }
 
     @Override

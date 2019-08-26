@@ -17,7 +17,8 @@ public class Writer {
     private FileWriter weightWriter;
     private int oNeurons;
     private int yNeurons;
-    private String dir = "../EvoPrac2Data/";
+//    private String dir = "../EvoPrac2Data/";
+    private String dir = "./data/";
 
     public Writer(int oNeurons, int yNeurons, String name) {
         this.oNeurons = oNeurons;

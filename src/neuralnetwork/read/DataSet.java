@@ -22,7 +22,7 @@ public class DataSet {
         totalSize = training.size() - 1;
         setParams();
         link();
-//        prune();
+        prune();
     }
 
     private void setParams(){

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.ToDoubleFunction;
 
 public class Network {
     public static void main(String[] args) {
@@ -20,20 +21,22 @@ public class Network {
 //        new Thread(run(0.0000000000001)).start();
 //        new Thread(run(0.000000000001)).start();
 //        new Thread(run(0.00000000001)).start();
-        new Thread(run(0.0000000001)).start();
+//        new Thread(run(0.0000000001)).start();
 //        new Thread(run(0.000000001)).start();
 //        new Thread(run(0.00000001)).start();
-//        new Thread(run(0.0000001)).start();
+        new Thread(run(0.0000001)).start();
 //        new Thread(run(0.000001)).start();
+//        new Thread(run(0.00001)).start();
     }
 
     private static Runnable run(double l){
         return () -> {
-            for (int iterations = 1; iterations <= 100; iterations++){
-                for(int epochs = 5; epochs <= 10; epochs++){
-                    new Network(l).run(epochs, iterations, l);
-                }
-            }
+//            for (int iterations = 1; iterations <= 100; iterations++){
+//                for(int epochs = 5; epochs <= 10; epochs++){
+//                    new Network(l).run(epochs, iterations, l).test(iterations, epochs);
+//                }
+//            }
+            new Network(l).run(5000, 2, l).test(5000, 2);
         };
     }
 
@@ -131,7 +134,7 @@ public class Network {
      * Controls all testing
      * Calls doTest to fire for an input pattern
      */
-    private double run(int epochs, int iterations, double learningRate){
+    private Network run(int epochs, int iterations, double learningRate){
 
 
         this.LEARNING_RATE = learningRate;
@@ -140,7 +143,9 @@ public class Network {
         initialiseWeights(1, 3);
 
 
-
+        double valErrorAvg  = 0.0;
+        double valStd       = 0.0;
+        ArrayList<Double> valErrors = new ArrayList<>();
         int e = 0;
         while (e < epochs){
             int i = 0;
@@ -153,22 +158,34 @@ public class Network {
                 }
                 writer.printTrainingIterationResults(LEARNING_RATE, error, i, e, dataSet.getTraining().size());
                 i++;
+
             }
 
-            //TODO: validation iterations
-//            average = 0;
-////            display();
 //            Iterator<InputPattern> validationIterator = dataSet.validationIterator();
+//            double valError = 0.0;
 //            while (validationIterator.hasNext()){
 //                InputPattern cur = validationIterator.next();
-//                average += validate(cur);
+//                double[] results = validate(cur);
+//                valError += results[1];
 //            }
-//            average = average / dataSet.getValidation().size();
-//            System.out.println(average / dataSet.getValidation().size());
+//
+//            valErrors.add(valError);
+//            valErrorAvg = valErrors.stream().mapToDouble(value -> value).sum() / valErrors.size();
+//            final double vg = valErrorAvg;
+//            valStd = valErrors.stream().mapToDouble(value -> Math.pow(value - vg, 2)).sum() / valErrors.size();
+//
+//            if (valError > valErrorAvg + valStd){
+//                System.out.println("stopped at:");
+//                System.out.println("    iterations: " + iterations);
+//                System.out.println("        epochs: " + epochs);
+//                return this;
+//            }
             e++;
-
         }
+        return this;
+    }
 
+    private double test(double epochs, double iterations){
         double average = 0.0;
         double error = 0.0;
         Iterator<InputPattern> testIterator = dataSet.testIterator();
@@ -204,7 +221,7 @@ public class Network {
 
     /**
      * TODO: calculate and return SSE
-     * Validation of an weights for an input pattern
+     * Validation of weights for an input pattern
      * @param cur input pattern being validated
      * @return average difference of outputs for cur for each output neuron
      */
